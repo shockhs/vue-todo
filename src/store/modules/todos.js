@@ -1,4 +1,6 @@
-import * as axios from "axios"
+import _ from 'lodash'
+import fbs from '../../firebase/firebase'
+import store from '../../store'
 
 
 const state = {
@@ -11,32 +13,40 @@ const getters = {
 }
 
 const actions = {
-    async fetchTodos({ commit }) {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/todos')
-        commit('setTodos', response.data)
+    fetchTodos({ commit }) {
+        fbs.database().ref(`/todolist/${store.state.auth.userId}`)
+            .on('value', list => commit('setTodos', (_.map(list.val(), (val, uid) => { return { ...val, uid } }))));
     },
-    async filterTodos({commit},event) {
+    async filterTodos({ commit }, event) {
         const limit = parseInt(event.target.options[event.target.options.selectedIndex].innerText)
-        const response = await axios.get(`https://jsonplaceholder.typicode.com/todos?_limit=${limit}`)
-        commit('setTodos',response.data)
+        let todos = []
+        fbs.database().ref(`/todolist/${store.state.auth.userId}`)
+            .on('value', list => todos = _.map(list.val(), (val, uid) => { return { ...val, uid } }));
+        
+        commit('setTodos', todos.slice(0,limit))
     },
-    async deleteTodo({commit},id) {
-        await axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
-        commit('removeTodo',id)
+    async deleteTodo({ commit }, id) {
+        await fbs.database().ref(`/todolist/${store.state.auth.userId}/${id}`)
+            .remove()
+            .then(() => {
+                // fix this
+                console.log('Todo deleted', commit);
+            })
     },
     async addTodo({ commit }, title) {
-        const response = await axios.post('https://jsonplaceholder.typicode.com/todos', {
-            title,
-            completed: false
-        })
-        commit('newTodo', response.data)
+        await fbs.database().ref(`/todolist/${store.state.auth.userId}`)
+            .push({ "title": title, "status": false })
+            .then(() => {
+                // fix this
+                console.log('Todo added', commit);
+            })
     }
 }
 
 const mutations = {
-    setTodos: (state, todos) => (state.todos = todos),
+    setTodos: (state, todos) => (state.todos = todos.reverse()),
     newTodo: (state, todo) => (state.todos = [todo, ...state.todos]),
-    removeTodo:(state,id) => (state.todos = state.todos.filter(todo => todo.id != id))
+    removeTodo: (state, id) => (state.todos = state.todos.filter(todo => todo.id != id))
 }
 
 export default {

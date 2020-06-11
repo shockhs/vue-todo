@@ -14,13 +14,7 @@ export default {
     Header: Header
   },
   computed: mapGetters(["currentUser"]),
-  methods: mapActions(["setAuthStatus"]),
-  created() {
-    this.setAuthStatus();
-    if (this.currentUser.is_authenticated) {
-      this.$router.go({ path: this.$router.path });
-    }
-  }
+  methods: mapActions(["setAuthStatus"])
 };
 </script>
 

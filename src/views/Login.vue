@@ -31,12 +31,13 @@ export default {
     ...mapActions(["loginUser"]),
     login: function(event) {
       event.preventDefault();
-      this.loginUser({ email: this.email, password: this.password });
-    }
-  },
-  updated() {
-    if (this.currentUser.is_authenticated) {
-      this.$router.go({ path: this.$router.path });
+      this.loginUser({ email: this.email, password: this.password })
+        .then(() => {
+          this.$router.replace({ name: "Home" });
+        })
+        .catch(() => {
+          console.log("login fail");
+        });
     }
   }
 };

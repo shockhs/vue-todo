@@ -31,7 +31,13 @@ export default {
     ...mapActions(["registerUser"]),
     register: function(event) {
       event.preventDefault();
-      this.registerUser({ email: this.email, password: this.password });
+      this.registerUser({ email: this.email, password: this.password })
+        .then(() => {
+          this.$router.replace({ name: "Home" });
+        })
+        .catch(() => {
+          console.log("login fail");
+        });
     }
   }
 };

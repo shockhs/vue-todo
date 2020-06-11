@@ -3,7 +3,7 @@
     <p>
       <input type="checkbox" v-bind:checked="todo.completed"  />
       {{todo.title}}
-      <i @click="deleteTodo(todo.id)" class="fas fa-trash-alt"></i>
+      <i @click="deleteTodo(todo.uid)" class="fas fa-trash-alt"></i>
     </p>
   </div>
 </template>

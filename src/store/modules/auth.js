@@ -1,12 +1,10 @@
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import config from '../../firebaseConfig';
-const fbs = !firebase.apps.length ? firebase.initializeApp(config) : firebase.app();
+import fbs from '../../firebase/firebase'
 
 const state = {
     userId: null,
     is_authenticated: false
 }
+
 
 const getters = {
     currentUser: state => state

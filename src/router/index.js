@@ -49,31 +49,12 @@ const router = new VueRouter({
 
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!store.state.auth.is_authenticated) {
-      next({
-        path: '/login',
-        query: {
-          redirect: to.fullPath
-        }
-      })
-    } else {
-      next()
-    }
-  } else if (to.matched.some(record => record.meta.requiresGuest)) {
-    if (store.state.auth.is_authenticated) {
-      next({
-        path: '/',
-        query: {
-          redirect: to.fullPath
-        }
-      })
-    } else {
-      next()
-    }
-  } else {
-    next()
-  }
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const currentUser = store.state.auth.is_authenticated;
+  console.log(currentUser);
+  if (requiresAuth && !currentUser) { next('/login'); }
+  else if (to.path === '/login' && currentUser) { next('/') }
+  else { next() }
 })
 
 
